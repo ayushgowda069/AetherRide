@@ -75,7 +75,7 @@ To simulate a real-world distributed environment with multiple nodes, use the cl
 
 ## Team Members
 
-*   **Full Stack Developer**: Ayush Goeda P
+*   **Full Stack Developer**: Ayush Gowda P
 *   **System Architect**: Kumar K C
 *   **Product Manager**: Yagnesh L
 
