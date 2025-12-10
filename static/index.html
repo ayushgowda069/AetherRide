@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aether Ride - Book a Ride</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="toast" id="toast">Ride Requested Successfully!</div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Aether Ride</h1>
+            <h2>Book Your Journey</h2>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="name" required placeholder="Enter your name">
+                </div>
+
+                <div class="form-group">
+                    <label>Pickup Location</label>
+                    <input type="text" id="pickup" required placeholder="e.g., Metro Station 1">
+                </div>
+
+                <div class="form-group">
+                    <label>Destination</label>
+                    <input type="text" id="destination" required placeholder="e.g., Tech Park">
+                </div>
+
+                <div class="form-group">
+                    <label>Estimated Fare</label>
+                    <div id="fareDisplay" style="font-size: 1.2rem; color: var(--primary-neon); font-weight: bold;">₹0
+                    </div>
+                </div>
+
+                <!-- Warp Pass Selector -->
+                <div class="warp-pass-container"
+                    style="border: 1px solid #333; padding: 10px; border-radius: 8px; margin-bottom: 20px; cursor: pointer; transition: all 0.3s;"
+                    onclick="toggleWarpPass()">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.5rem;">⚡</span>
+                            <div>
+                                <div style="color: #ff00ff; font-weight: bold;">Warp Pass</div>
+                                <div style="font-size: 0.8rem; color: #aaa;">Priority Pickup & Gold Status</div>
+                            </div>
+                        </div>
+                        <div style="color: var(--success-color); font-weight: bold;">+₹50</div>
+                    </div>
+                    <input type="checkbox" id="warpPass" style="display: none;">
+                </div>
+
+                <button type="submit" id="submitBtn">Request Ride</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Waiting Overlay -->
+    <div id="waitingOverlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <h2 style="color: #fff; margin-bottom: 10px;">Finding your Driver...</h2>
+        <div class="loader"
+            style="border: 4px solid #333; border-top: 4px solid var(--primary-neon); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px;">
+        </div>
+        <div id="timerDisplay" style="color: #aaa; font-size: 1.2rem; margin-bottom: 20px;">00:00</div>
+
+        <!-- Panic Button (Hidden initially) -->
+        <div id="panicButtonContainer" style="display: none; animation: pulse 1s infinite;">
+            <p style="color: #ff00ff; margin-bottom: 10px;">Taking too long?</p>
+            <button onclick="boostPriority()"
+                style="background: linear-gradient(45deg, #ff00ff, #ff0000); box-shadow: 0 0 20px #ff00ff; border: none; padding: 15px 30px; color: white; font-weight: bold; border-radius: 50px; cursor: pointer; font-size: 1.2rem;">
+                🚀 BOOST PRIORITY (⚡ WARP)
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+
+    <script>
+        const API_URL = window.location.origin;
+        let currentRideId = null;
+        let waitingTimer = null;
+        let secondsWaiting = 0;
+
+        function toggleWarpPass() {
+            const checkbox = document.getElementById('warpPass');
+            const container = document.querySelector('.warp-pass-container');
+
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                container.style.border = '1px solid #ff00ff';
+                container.style.boxShadow = '0 0 10px rgba(255, 0, 255, 0.3)';
+                container.style.background = 'rgba(255, 0, 255, 0.1)';
+                document.body.classList.add('warp-active'); // Trigger Background Effect
+            } else {
+                container.style.border = '1px solid #333';
+                container.style.boxShadow = 'none';
+                container.style.background = 'transparent';
+                document.body.classList.remove('warp-active'); // Stop Effect
+            }
+            calculateFare();
+        }
+
+        // Fare Calculation Logic
+        function calculateFare() {
+            const pickup = document.getElementById('pickup').value;
+            const dest = document.getElementById('destination').value;
+            const isPriority = document.getElementById('warpPass').checked;
+
+            // Mock Logic: Base ₹50 + ₹10 per character of destination
+            const distance = dest.length;
+            let fare = 50 + (distance * 5);
+
+            if (isPriority) {
+                fare += 50;
+            }
+
+            document.getElementById('fareDisplay').innerText = `₹${fare}`;
+            return fare;
+        }
+
+        // Smart Pre-Selection Logic
+        document.getElementById('destination').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const checkbox = document.getElementById('warpPass');
+            const container = document.querySelector('.warp-pass-container');
+
+            if ((val.includes('airport') || val.includes('hospital')) && !checkbox.checked) {
+                // Manually toggle without inverting checked state first (since we want to force it ON)
+                checkbox.checked = false; // Reset to ensure toggle turns it ON
+                toggleWarpPass();
+
+                // Visual cue
+                container.style.transition = 'transform 0.2s';
+                container.style.transform = 'scale(1.05)';
+                setTimeout(() => container.style.transform = 'scale(1)', 200);
+            }
+            calculateFare();
+        });
+        document.getElementById('pickup').addEventListener('input', calculateFare);
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fare = calculateFare();
+            const isPriority = document.getElementById('warpPass').checked;
+
+            const data = {
+                user_name: document.getElementById('name').value,
+                pickup_location: document.getElementById('pickup').value,
+                destination: document.getElementById('destination').value,
+                fare: fare,
+                is_priority: isPriority
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/ride_request/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const ride = await response.json();
+                    currentRideId = ride.id;
+
+                    // Show Waiting Overlay
+                    showWaitingOverlay();
+
+                    document.getElementById('bookingForm').reset();
+                    document.getElementById('fareDisplay').innerText = "₹0";
+
+                    // Reset Warp Pass UI
+                    if (document.getElementById('warpPass').checked) {
+                        toggleWarpPass();
+                    }
+                } else {
+                    alert('Failed to book ride');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error connecting to server');
+            }
+        });
+
+        function showWaitingOverlay() {
+            const overlay = document.getElementById('waitingOverlay');
+            overlay.style.display = 'flex';
+            secondsWaiting = 0;
+            document.getElementById('timerDisplay').innerText = "00:00";
+            document.getElementById('panicButtonContainer').style.display = 'none';
+
+            if (waitingTimer) clearInterval(waitingTimer);
+
+            waitingTimer = setInterval(() => {
+                secondsWaiting++;
+                const mins = Math.floor(secondsWaiting / 60).toString().padStart(2, '0');
+                const secs = (secondsWaiting % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+
+                // Panic Button Logic: Show after 5 seconds
+                if (secondsWaiting > 5) {
+                    document.getElementById('panicButtonContainer').style.display = 'block';
+                }
+
+                checkRideStatus();
+            }, 1000);
+        }
+
+        async function checkRideStatus() {
+            if (!currentRideId) return;
+            try {
+                // Polling for status update
+                const response = await fetch(`${API_URL}/rides`);
+                const rides = await response.json();
+                const myRide = rides.find(r => r.id === currentRideId);
+
+                if (myRide && myRide.status === 'ACCEPTED') {
+                    clearInterval(waitingTimer);
+                    document.getElementById('waitingOverlay').style.display = 'none';
+                    showToast("Driver Found! Ride Accepted.");
+                    currentRideId = null;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function boostPriority() {
+            if (!currentRideId) return;
+            try {
+                const response = await fetch(`${API_URL}/rides/${currentRideId}/upgrade`, {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    alert("🚀 PRIORITY BOOSTED! You are now at the front of the line.");
+                    document.getElementById('panicButtonContainer').style.display = 'none'; // Hide button after use
+                    document.body.classList.add('warp-active'); // Trigger effect
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function showToast(msg = "Ride Requested Successfully!") {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Show connected port
+        const port = window.location.port;
+        const indicator = document.createElement('div');
+        indicator.className = 'server-indicator';
+        indicator.innerText = `Connected to Node: ${port}`;
+        document.body.appendChild(indicator);
+    </script>
+</body>
+
+</html>

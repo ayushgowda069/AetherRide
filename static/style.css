@@ -1,0 +1,426 @@
+:root {
+    --bg-color: #050510;
+    --card-bg: #101025;
+    --primary-neon: #00f3ff;
+    --secondary-neon: #bc13fe;
+    --text-color: #ffffff;
+    --text-muted: #a0a0b0;
+    --success-color: #00ff9d;
+    --danger-color: #ff0055;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 50% 50%, #1a1a40 0%, #050510 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+h1,
+h2,
+h3 {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--primary-neon);
+}
+
+h1 {
+    color: var(--primary-neon);
+}
+
+h2 {
+    color: var(--secondary-neon);
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.5);
+}
+
+button.secondary {
+    background: transparent;
+    border: 1px solid var(--primary-neon);
+    color: var(--primary-neon);
+}
+
+button.success {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: none;
+    animation: slideIn 0.5s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    color: var(--primary-neon);
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-PENDING {
+    background: rgba(255, 165, 0, 0.2);
+    color: orange;
+}
+
+.status-ACCEPTED {
+    background: rgba(0, 243, 255, 0.2);
+    color: var(--primary-neon);
+}
+
+.status-COMPLETED {
+    background: rgba(0, 255, 157, 0.2);
+    color: var(--success-color);
+}
+
+.status-AVAILABLE {
+    background: rgba(0, 255, 157, 0.2);
+    color: var(--success-color);
+}
+
+.status-BUSY {
+    background: rgba(255, 0, 85, 0.2);
+    color: var(--danger-color);
+}
+
+.ride-card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-neon);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 50% 50%, #1a1a40 0%, #050510 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+h1,
+h2,
+h3 {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--primary-neon);
+}
+
+h1 {
+    color: var(--primary-neon);
+}
+
+h2 {
+    color: var(--secondary-neon);
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.5);
+}
+
+button.secondary {
+    background: transparent;
+    border: 1px solid var(--primary-neon);
+    color: var(--primary-neon);
+}
+
+button.success {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: none;
+    animation: slideIn 0.5s ease;
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    color: var(--primary-neon);
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-PENDING {
+    background: rgba(255, 165, 0, 0.2);
+    color: orange;
+}
+
+.status-ACCEPTED {
+    background: rgba(0, 243, 255, 0.2);
+    color: var(--primary-neon);
+}
+
+.status-COMPLETED {
+    background: rgba(0, 255, 157, 0.2);
+    color: var(--success-color);
+}
+
+.status-AVAILABLE {
+    background: rgba(0, 255, 157, 0.2);
+    color: var(--success-color);
+}
+
+.status-BUSY {
+    background: rgba(255, 0, 85, 0.2);
+    color: var(--danger-color);
+}
+
+.ride-card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-neon);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ride-info div {
+    margin-bottom: 5px;
+}
+
+.ride-actions button {
+    width: auto;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.server-indicator {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 243, 255, 0.1);
+    border: 1px solid var(--primary-neon);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    color: var(--primary-neon);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}

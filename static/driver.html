@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aether Ride - Driver Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Driver Dashboard</h1>
+            <h2 id="driverInfo">Loading...</h2>
+
+            <div id="assignedSection" style="display: none;">
+                <h3>My Assigned Ride</h3>
+                <div id="assignedRideContainer"></div>
+            </div>
+
+            <div id="pendingSection">
+                <h3>Pending Rides</h3>
+                <div id="pendingRidesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        const urlParams = new URLSearchParams(window.location.search);
+        const driverId = urlParams.get('driver_id');
+
+        if (!driverId) {
+            alert("No driver ID provided!");
+            window.location.href = "/";
+        }
+
+        async function fetchDriverInfo() {
+            try {
+                const response = await fetch(`${API_URL}/drivers`);
+                const drivers = await response.json();
+                const driver = drivers.find(d => d.id == driverId);
+                if (driver) {
+                    const statusClass = `status-${driver.status}`;
+                    document.getElementById('driverInfo').innerHTML =
+                        `Welcome, ${driver.name} | Status: <span class="status-badge ${statusClass}">${driver.status}</span>`;
+                }
+            } catch (e) {
+                console.error("Error fetching driver info:", e);
+            }
+        }
+
+        async function fetchAssignedRide() {
+            try {
+                console.log(`Fetching assigned ride for Driver ${driverId}...`);
+                const response = await fetch(`${API_URL}/driver/${driverId}/assigned_ride`);
+                const ride = await response.json();
+                console.log("Assigned Ride API Response:", ride);
+
+                const container = document.getElementById('assignedRideContainer');
+                const section = document.getElementById('assignedSection');
+                const pendingSection = document.getElementById('pendingSection');
+
+                if (ride) {
+                    console.log("Ride found! Displaying assigned section.");
+                    section.style.display = 'block';
+                    // pendingSection.style.display = 'none'; 
+
+                    container.innerHTML = `
+                        <div class="ride-card" style="border-color: var(--success-color);">
+                            <div class="ride-info">
+                                <div><strong>Passenger:</strong> ${ride.user_name}</div>
+                                <div><strong>From:</strong> ${ride.pickup_location}</div>
+                                <div><strong>To:</strong> ${ride.destination}</div>
+                            </div>
+                            <div class="ride-actions">
+                                <button class="success" onclick="completeRide(${ride.id})">Complete Ride</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    console.log("No assigned ride found.");
+                    section.style.display = 'none';
+                    pendingSection.style.display = 'block';
+                    container.innerHTML = '';
+                }
+            } catch (error) {
+                console.error("Error fetching assigned ride:", error);
+            }
+        }
+
+        async function fetchPendingRides() {
+            try {
+                const response = await fetch(`${API_URL}/rides?status=PENDING`);
+                const rides = await response.json();
+
+                const container = document.getElementById('pendingRidesContainer');
+                container.innerHTML = '';
+
+                if (rides.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No pending rides.</p>';
+                    return;
+                }
+
+                rides.forEach(ride => {
+                    const card = document.createElement('div');
+                    card.className = 'ride-card';
+
+                    // Priority Styling
+                    let priorityBadge = '';
+                    if (ride.is_priority) {
+                        card.style.border = '2px solid #ffd700'; // Gold border
+                        card.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.5)'; // Gold glow
+                        priorityBadge = '<div style="background: #ffd700; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 5px;">⚡ WARP PASS ACTIVE</div>';
+                    }
+
+                    card.innerHTML = `
+                        <div class="ride-info">
+                            ${priorityBadge}
+                            <div><strong>Passenger:</strong> ${ride.user_name}</div>
+                            <div><strong>From:</strong> ${ride.pickup_location}</div>
+                            <div><strong>To:</strong> ${ride.destination}</div>
+                            <div style="margin-top: 5px; color: var(--success-color); font-weight: bold;">Fare: ₹${ride.fare}</div>
+                        </div>
+                        <div class="ride-actions">
+                            <button onclick="acceptRide(${ride.id})" style="${ride.is_priority ? 'background: #ffd700; color: #000;' : ''}">
+                                ${ride.is_priority ? '⚡ ACCEPT PRIORITY' : 'Accept'}
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Error fetching pending rides:", e);
+            }
+        }
+
+        async function acceptRide(rideId) {
+            try {
+                const response = await fetch(`${API_URL}/accept_ride/${rideId}?driver_id=${driverId}`, {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    refreshData();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || "Failed to accept ride");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function completeRide(rideId) {
+            try {
+                const response = await fetch(`${API_URL}/complete_ride/${rideId}`, {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    refreshData();
+                } else {
+                    alert("Failed to complete ride");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function refreshData() {
+            fetchDriverInfo();
+            fetchAssignedRide();
+            fetchPendingRides();
+        }
+
+        // Initial load
+        refreshData();
+
+        // Poll every 2 seconds
+        setInterval(refreshData, 2000);
+
+        // Show connected port
+        const port = window.location.port;
+        const indicator = document.createElement('div');
+        indicator.className = 'server-indicator';
+        indicator.innerText = `Connected to Node: ${port}`;
+        document.body.appendChild(indicator);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aether Ride - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container" style="max-width: 1000px;">
+        <div class="card">
+            <h1>Admin Control Center</h1>
+
+            <h3>Driver Status</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="driverTable"></tbody>
+            </table>
+
+            <h3 style="margin-top: 40px;">All Rides</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Fare</th>
+                        <th>Status</th>
+                        <th>Driver ID</th>
+                    </tr>
+                </thead>
+                <tbody id="rideTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        async function fetchDrivers() {
+            try {
+                const response = await fetch(`${API_URL}/drivers`);
+                const drivers = await response.json();
+
+                const tbody = document.getElementById('driverTable');
+                tbody.innerHTML = drivers.map(d => `
+                    <tr>
+                        <td>${d.id}</td>
+                        <td>${d.name}</td>
+                        <td><span class="status-badge status-${d.status}">${d.status}</span></td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error("Error fetching drivers:", e);
+            }
+        }
+
+        async function fetchRides() {
+            try {
+                const response = await fetch(`${API_URL}/rides`);
+                const rides = await response.json();
+
+                const tbody = document.getElementById('rideTable');
+                tbody.innerHTML = rides.map(r => `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>
+                            ${r.user_name}
+                            ${r.is_priority ? '<span style="color: #ff00ff; margin-left: 5px;">⚡</span>' : ''}
+                        </td>
+                        <td>${r.pickup_location}</td>
+                        <td>${r.destination}</td>
+                        <td>₹${r.fare || 0}</td>
+                        <td><span class="status-badge status-${r.status}">${r.status}</span></td>
+                        <td>${r.driver_id || '-'}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error("Error fetching rides:", e);
+            }
+        }
+        function refreshData() {
+            fetchDrivers();
+            fetchRides();
+        }
+
+        refreshData();
+        setInterval(refreshData, 2000);
+
+        // Show connected port
+        const port = window.location.port;
+        const indicator = document.createElement('div');
+        indicator.className = 'server-indicator';
+        indicator.innerText = `Connected to Node: ${port}`;
+        document.body.appendChild(indicator);
+    </script>
+</body>
+
+</html>

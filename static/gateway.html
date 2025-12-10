@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aether Ride - Global Gateway</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Matrix-like background */
+        .bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #111 0%, #000 100%);
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px #0f0;
+            margin-bottom: 50px;
+            letter-spacing: 5px;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            z-index: 10;
+        }
+
+        .node-btn {
+            width: 250px;
+            height: 300px;
+            border: 2px solid #333;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .node-btn:hover {
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+
+        .node-btn h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .node-btn p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .node-btn .status {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #0f0;
+        }
+
+        /* Specific Styles */
+        .user-node {
+            border-color: #00f3ff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .user-node:hover {
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .user-node h2 {
+            color: #00f3ff;
+        }
+
+        .driver-node {
+            border-color: #bc13fe;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.1);
+        }
+
+        .driver-node:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.4);
+            background: rgba(188, 19, 254, 0.1);
+        }
+
+        .driver-node h2 {
+            color: #bc13fe;
+        }
+
+        .admin-node {
+            border-color: #ff0055;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.1);
+        }
+
+        .admin-node:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
+            background: rgba(255, 0, 85, 0.1);
+        }
+
+        .admin-node h2 {
+            color: #ff0055;
+        }
+
+        .loading {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg"></div>
+
+    <h1>AETHER RIDE GATEWAY</h1>
+
+    <div class="container">
+        <!-- User Node -->
+        <div class="node-btn user-node" onclick="connectUser()">
+            <div style="font-size: 4rem; margin-bottom: 20px;">📱</div>
+            <h2>PASSENGER</h2>
+            <p>Connect to Grid</p>
+            <div class="status">● NODES ACTIVE: 8000-8007</div>
+            <div class="loading" id="user-load">Load Balancing...</div>
+        </div>
+
+        <!-- Driver Node -->
+        <div class="node-btn driver-node" onclick="connectDriver()">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🚖</div>
+            <h2>DRIVER</h2>
+            <p>Access Fleet System</p>
+            <div class="status">● NODES ACTIVE: 7000-7007</div>
+            <div class="loading" id="driver-load">Syncing...</div>
+        </div>
+
+        <!-- Admin Node -->
+        <div class="node-btn admin-node" onclick="connectAdmin()">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🛡️</div>
+            <h2>ADMIN</h2>
+            <p>System Control</p>
+            <div class="status">● NODE ACTIVE: 6001</div>
+            <div class="loading" id="admin-load">Secure Link</div>
+        </div>
+    </div>
+
+    <script>
+        async function spawnAndConnect(type) {
+            const btnId = type + '-btn';
+            const loadId = type + '-load';
+
+            document.getElementById(loadId).innerText = "Launching Node...";
+            document.body.style.cursor = "wait";
+
+            try {
+                const response = await fetch(`/spawn/${type}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById(loadId).innerText = `Active on Port ${data.port}`;
+                    // We try to open here, but backend also opens it to be safe against popups
+                    window.open(data.url, '_blank');
+                } else {
+                    alert(data.error || "Failed to launch node");
+                    document.getElementById(loadId).innerText = "Error";
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Connection to Master Node failed!");
+            } finally {
+                document.body.style.cursor = "default";
+            }
+        }
+
+        function connectUser() { spawnAndConnect('user'); }
+        function connectDriver() { spawnAndConnect('driver'); }
+        function connectAdmin() { spawnAndConnect('admin'); }
+
+        // Visual Effects
+        setInterval(() => {
+            // Keep alive animation
+        }, 500);
+    </script>
+
+</body>
+
+</html>
