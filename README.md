@@ -1,40 +1,84 @@
-AetherRide
-Description
-AetherRide is a simple client-server project that demonstrates how ride requests can be sent from a client to a server using Python. The server is built with Flask, while the client uses the requests library. This project serves as a basic demonstration of ride-sharing functionality, focusing on REST API interactions and modular code structure.
+# AetherRide
 
-Features
-REST API Backend: Built with Flask for handling ride requests.
-Client Communication: Python client using the requests library to send JSON ride requests.
-Structured Responses: Server responds with JSON data for ride status and confirmations.
-Modular Structure: Separate folders for client and server for clean organization.
-Demo-Focused: Lightweight implementation for educational or prototyping purposes.
-Installation
-Prerequisites:
+**AetherRide** is a next-generation ride-sharing platform designed to revolutionize urban mobility. It connects passengers with drivers in real-time, offering a seamless, fast, and reliable experience powered by advanced technology.
 
-Python 3.x installed.
-Install required libraries: pip install flask requests.
-Clone the Repository:
+## Features
 
-git clone [repository URL]
-Navigate to the project directory.
-Run the Server:
+*   **Real-time Ride Booking**: Users can easily request rides by specifying pickup and drop-off locations.
+*   **Intelligent Driver Matching**: Efficient assignment of available drivers to ride requests.
+*   **Live Status Updates**: Real-time tracking of ride status (Pending, Accepted, Completed).
+*   **Warp Pass (Priority Upgrade)**: Premium option for users to get priority matching.
+*   **Driver Dashboard**: Dedicated interface for drivers to view and accept assigned rides.
+*   **Admin Dashboard**: Tools for monitoring platform activity and managing resources.
 
-Go to the server folder.
-Run python app.py (or equivalent script).
-Run the Client:
+## Technology Stack
 
-Go to the client folder.
-Run python client.py (or equivalent script) to send requests.
-Usage
-Start the Flask server on localhost (default port 5000).
-Use the client script to send ride requests via HTTP POST.
-Example: The client sends a JSON payload like {"pickup": "Location A", "destination": "Location B"} to /ride_request/.
-Server processes the request and returns a JSON response with ride details.
-Team
-Ayush Gowda P: Full Stack Developer
-Kumar K C: System Architect
-Yagnesh L: Product Manager
-Contributing
-Fork the repository.
-Create a feature branch.
-Submit a pull request with changes.
+*   **Backend**: FastAPI (Python)
+*   **Database**: PostgreSQL
+*   **Frontend**: HTML, CSS, JavaScript
+*   **Deployment**: Localhost (Development), Render/Railway (Production ready)
+
+## Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url>
+    cd AETHER_RIDE
+    ```
+
+2.  **Create a virtual environment:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Set up the database:**
+    Ensure you have PostgreSQL installed and running. Update the database connection string in `database.py` if necessary.
+    ```bash
+    # Run database initialization scripts (if any)
+    python reset_db.py
+    ```
+
+
+## Distributed Cluster Launch (New Feature)
+
+To simulate a real-world distributed environment with multiple nodes, use the cluster launcher script. This will spawn multiple server instances for users, drivers, and an admin node.
+
+1.  **Run the Cluster Script:**
+    ```bash
+    python run_cluster.py
+    ```
+
+2.  **Cluster Configuration:**
+    *   **Admin Node**: Port `6001`
+    *   **Driver Nodes**: Ports `7000` - `7007`
+    *   **User Nodes**: Ports `8000` - `8007`
+
+3.  **Access the Gateway:**
+    The script will automatically open the **Gateway** (`AETHER_RIDE/static/gateway.html`) in your default browser. This gateway allows you to easily navigate between the different nodes.
+
+
+
+## Project Structure
+
+*   `main.py`: Entry point of the FastAPI application.
+*   `models.py`: SQLAlchemy database models.
+*   `schemas.py`: Pydantic schemas for data validation.
+*   `database.py`: Database connection and session management.
+*   `static/`: Contains frontend HTML, CSS, and JS files.
+*   `AetherRide_Project_Report.md`: Comprehensive project report and documentation.
+
+## Team Members
+
+*   **Full Stack Developer**: Ayush Goeda P
+*   **System Architect**: Kumar K C
+*   **Product Manager**: Yagnesh L
+
+## License
+
+[MIT License](LICENSE.md) - See the LICENSE.md file for details.
